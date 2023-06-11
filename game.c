@@ -6,7 +6,9 @@
  *  @author Celestino Lopéz (2022@isec.pt)
  *
  *  @bug Problema na escolha de tamanho que ocorre a cada 9-10 escolhas, corrigido com o uso de arrays, 
- *       possivelmente num ficheiro ".h" externo
+ *       possivelmente num ficheiro ".h" externo;
+ *        
+ *       Bug ao sair com CTRL+C eum que não faz clrscr;
  */
 
 
@@ -16,6 +18,12 @@
 #include <string.h>
 #include <time.h>
 
+//limpa o terminal
+#ifdef _WIN32
+    #define CLEAR_SCREEN "cls"
+#else
+    #define CLEAR_SCREEN "clear"
+#endif
 
 // variáveis globais
 #define MAX_PALAVRA 20
@@ -91,17 +99,24 @@ void adivinharLetra(char* palavra, char* palavraAdivinhada, char letra, int* ten
     }
 }
 
+void limparTela() {
+    system(CLEAR_SCREEN);
+}
+
 // função principal que chama o jogo
 void jogar() {
     int nivel = 1;
     int tentativasRestantes = MAX_TENTATIVAS;
 
-    printf("Bem-vindo ao Jogo Adivinha-Palavras!\n");
-    printf("by Valente&Marotta\n");
+    
 
     while (1) {
-        printf("\nMenu:\n");
-        printf("1 - Jogar\n");
+        limparTela();
+        printf("========================================\n");
+        printf("=           Adivinha-Palavras!         =\n");
+        printf("=           by Valente&Marotta         =\n");
+        printf("========================================\n");
+        printf("\n1 - Jogar\n");
         printf("2 - Definir número de tentativas\n");
         printf("3 - Definir dificuldade (nível de palavras)\n");
         printf("4 - Imprimir as regras do jogo\n");
@@ -110,10 +125,11 @@ void jogar() {
         int opcao;
         printf("\nInsira uma opção: ");
         scanf("%d", &opcao);
-        getchar(); // Limpar o caractere de nova linha
+        getchar();
 
-        switch (opcao) { //opção 1 - Jogar
-            case 1: {
+        switch (opcao) {
+            case 1: { //JOGO
+                limparTela();
                 char* palavraSecreta = escolherPalavra(nivel);
                 if (palavraSecreta == NULL) {
                     printf("Erro: Nível de dificuldade inválido!\n");
@@ -136,13 +152,15 @@ void jogar() {
 
                     char letra;
                     scanf(" %c", &letra);
-                    getchar(); // Limpar o caractere de nova linha
+                    getchar();
 
                     adivinharLetra(palavraSecreta, palavraAdivinhada, letra, &tentativasRestantes);
                 }
 
                 if (strcmp(palavraAdivinhada, palavraSecreta) == 0) {
+                    printf("-----------------------------------------------------------------------");
                     printf("\nParabéns! Você adivinhou a palavra secreta: %s\n", palavraSecreta);
+                    printf("-----------------------------------------------------------------------");
                 } else {
                     printf("\nGame Over! A palavra secreta era: %s\n", palavraSecreta);
                 }
@@ -151,10 +169,11 @@ void jogar() {
             }
 
             case 2: { // muda as tentativas
+                limparTela();
                 int novoNumTentativas;
                 printf("Insira o novo número de tentativas (entre 3 e 15): ");
                 scanf("%d", &novoNumTentativas);
-                getchar(); // Limpar o caractere de nova linha
+                getchar();
 
                 if (novoNumTentativas < 3 || novoNumTentativas > 15) {
                     printf("Erro: Número de tentativas inválido!\n");
@@ -167,6 +186,7 @@ void jogar() {
             }
 
             case 3: { // muda as dificuldades
+                limparTela();
                 printf("Níveis de dificuldade:\n");
                 printf("1 - Fácil\n");
                 printf("2 - Médio\n");
@@ -186,6 +206,7 @@ void jogar() {
             }
 
             case 4: { // dá print às regras
+                limparTela();
                 printf("\nRegras do Jogo:\n");
                 printf("- Será apresentada uma palavra secreta que você deve adivinhar.\n");
                 printf("- A palavra será representada por traços, indicando as letras que você precisa descobrir.\n");
@@ -199,19 +220,23 @@ void jogar() {
             }
 
             case 5: { // sair do jogo
-                printf("Obrigado por jogar! Até logo!\n");
+                limparTela();
+                printf("Obrigado por jogar! Até mais!\n");
                 exit(0);
             }
 
-            default: //opção default é inv. para controlo de erros
+            default: { // opção default é inv. para controlo de erros
                 printf("Erro: Opção inválida!\n");
                 break;
+            }
         }
+
+        printf("\nPressione Enter para continuar...");
+        getchar();
     }
 }
 
-int main() { // ao dar boot ao jogo, chamar a função principal
-    jogar();
-
+int main() {
+    jogar(); // ao dar boot ao jogo, chamar a função principal
     return 0;
 }
